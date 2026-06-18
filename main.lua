@@ -1,46 +1,48 @@
 lines = {""}
-cursorLine = 1
-cursorColumn = 4
+cursorLine = #lines
+cursorColumn = #lines[cursorLine] + 1
 cameraX = 0
 cameraY = 0
-local font
 
 function love.load()
     font = love.graphics.newFont("JetBrainsMonoNerdFontMono-Regular.ttf", 64)
     love.graphics.setFont(font)
-end
 
+    debugFont = love.graphics.newFont("JetBrainsMonoNerdFontMono-Regular.ttf", 10)
+end
 function love.update(dt)
     local lastLine = lines[#lines]
-    local cursorX = font:getWidth(lastLine)
-    local cursorY = font:getHeight(lastLine)
+    local caretX = font:getWidth(lastLine)
+    local caretY = font:getHeight(lastLine)
 
     local screenWidth = love.graphics.getWidth()
     local screenHeight = love.graphics.getHeight()
 
-    if cursorX - cameraX > screenWidth - 50 then
-        cameraX = cursorX - (screenWidth - 50)
-    end
-    if cursorY - cameraY > screenHeight - 50 then
-        cameraY = cursorY - (screenHeight - 50)
+    if caretX - cameraX > screenWidth - 50 then
+        cameraX = caretX - (screenWidth - 50)
     end
 
-    if cursorX - cameraX < 50 then
+    if caretX - cameraX < 50 then
         cameraX = math.max(0, font:getWidth(lines[#lines]) - love.graphics.getWidth() + 100)
     end
-    if cursorY - cameraY < 50 then
-        cameraY = math.max(0, font:getHeight(lines[#lines]) - love.graphics.getHeight() + 100)
-    end
+
+    cursorLine = #lines
+    cursorColumn = #lines[cursorLine] + 1
+    position = cursorLine.. ",".. cursorColumn
 end
 
 function love.draw()
-    local lastLine = lines[#lines]
     love.graphics.push()
     love.graphics.translate(-cameraX, 0)
+    
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.setFont(font)
 
     local textX = 0
     local textY = 0
-
+    
+    local lastLine = lines[#lines]
+    -- draw the text
     for i, line in ipairs(lines) do
         love.graphics.print(
             line,
@@ -48,16 +50,26 @@ function love.draw()
             0 + (i - 1) * font:getHeight()
         )
     end
+    -- draw the caret
+    local beforeCursor =
+    lines[cursorLine]:sub(1, cursorColumn - 1)
 
-    local cursorX = textX + font:getWidth(lastLine)
+    local cursorX = font:getWidth(beforeCursor)
+    local cursorY = (cursorLine - 1) * font:getHeight()
     love.graphics.line(
         cursorX,
-        textY,
+        cursorY,
         cursorX,
-        textY + font:getHeight()
+        cursorY + font:getHeight()
     )
 
     love.graphics.pop()
+
+    love.graphics.setFont(debugFont)
+    love.graphics.setColor(0,1,0,1)
+    love.graphics.print("Cursor Line: ".. cursorLine, 10, love.graphics.getHeight() - 20)
+    love.graphics.print("Cursor Column: ".. cursorColumn, 10, love.graphics.getHeight() - 30)
+    love.graphics.print("Position: ".. position, 10, love.graphics.getHeight() - 45)
 end
 
 function love.textinput(t)
