@@ -76,7 +76,6 @@ function love.textinput(t)
 end
 
 function love.keypressed(key)
-    local line = lines[cursorLine]
     if key == "backspace" then
         if #lines > 1 and lines[cursorLine] == "" then
             table.remove(lines, cursorLine)
@@ -92,18 +91,23 @@ function love.keypressed(key)
         local line = lines[cursorLine]
         cursorColumn = math.min(cursorColumn, #line + 1)
     end
+    -- deal with moving left in a line
     if key == 'left' then
         cursorColumn = math.max(1, cursorColumn -1)
     end
+    -- deal with moving right in a line
     if key == 'right' then
+        local line = lines[cursorLine]
         cursorColumn = math.min(#line + 1, cursorColumn + 1)
     end
+    -- deal with moving up lines
     if key == 'up' then
         cursorLine = math.max(1, cursorLine - 1)
 
         local line = lines[cursorLine]
         cursorColumn = math.min(cursorColumn, #line + 1)
     end
+    -- deal with moving down lines
     if key == 'down' and cursorLine ~= #lines then
         cursorLine = math.max(1, cursorLine + 1)
 
