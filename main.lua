@@ -77,6 +77,7 @@ end
 
 function love.keypressed(key)
     if key == "backspace" then
+        local line = lines[cursorLine] --whats up my "savior"?
         if #lines > 1 and lines[cursorLine] == "" then
             table.remove(lines, cursorLine)
         end
@@ -87,8 +88,12 @@ function love.keypressed(key)
             AND then replacing the old lines[#lines] with that one we just made.
             THE PROBLEM IS THAT IT REMOVES THE LAST CHARACTER OF THE STRING (lines[#lines] could be like "hello")
             I DONT KNOW HOW HOW TO TELL IT TO REMOVE WHERE THE cursorColumn IS.
+
+            YAY ITS FIXED
         ]]--
-        lines[#lines] = lines[#lines]:sub(1, -2)
+        local left = line:sub(1, cursorColumn - 2)
+        local right = line:sub(cursorColumn)
+        lines[#lines] = left .. right
         
         cursorColumn = math.max(1, cursorColumn -1)
         cursorLine = math.max(1, cursorLine -1)
