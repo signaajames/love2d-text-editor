@@ -82,7 +82,10 @@ function love.keypressed(key)
         end
         --[[
             This line below this comment is a BETA.
-            WE are re assigning lines[#lines] (could be "hello") to a lines[#lines] that has it's second to last end removed.
+            We make a new lines[#lines] that is modified with the
+                `:sub(1, -2)`
+            AND then replacing the old lines[#lines] with that one we just made.
+            THE PROBLEM IS THAT IT REMOVES THE LAST CHARACTER OF THE STRING (lines[#lines] could be like "hello")
             I DONT KNOW HOW HOW TO TELL IT TO REMOVE WHERE THE cursorColumn IS.
         ]]--
         lines[#lines] = lines[#lines]:sub(1, -2)
