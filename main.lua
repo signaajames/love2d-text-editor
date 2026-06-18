@@ -96,4 +96,10 @@ function love.keypressed(key)
     if key == 'right' then
         cursorColumn = math.max(1, cursorColumn + 1)
     end
+    if key == 'up' then
+        cursorLine = math.max(1, cursorColumn - 1)
+    end
+    if key == 'down' then
+        cursorLine = math.max(1, cursorLine + 1)
+    end
 end
