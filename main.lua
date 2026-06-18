@@ -1,6 +1,6 @@
 lines = {""}
 cursorLine = #lines
-cursorColumn = #lines[cursorLine] + 1
+cursorColumn = #lines[#lines] + 1
 cameraX = 0
 cameraY = 0
 
@@ -26,8 +26,6 @@ function love.update(dt)
         cameraX = math.max(0, font:getWidth(lines[#lines]) - love.graphics.getWidth() + 100)
     end
 
-    cursorLine = #lines
-    cursorColumn = #lines[cursorLine] + 1
     position = cursorLine.. ",".. cursorColumn
 end
 
@@ -38,9 +36,6 @@ function love.draw()
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.setFont(font)
 
-    local textX = 0
-    local textY = 0
-    
     local lastLine = lines[#lines]
     -- draw the text
     for i, line in ipairs(lines) do
@@ -73,7 +68,14 @@ function love.draw()
 end
 
 function love.textinput(t)
-    lines[#lines] = lines[#lines] .. t
+    local line = lines[cursorLine]
+
+    lines[cursorLine] = 
+        line:sub(1, cursorColumn -1)
+        .. t ..
+        line:sub(cursorColumn)
+
+    cursorColumn = cursorColumn + #t
 end
 
 function love.keypressed(key)
@@ -82,8 +84,13 @@ function love.keypressed(key)
             table.remove(lines)
         end
         lines[#lines] = lines[#lines]:sub(1, -2)
+        cursorColumn = math.max(1, cursorColumn -1)
     end
     if key == "return" then
         table.insert(lines, "")
+        cursorLine = #lines
+    end
+    if key == 'left' then
+        cursorColumn = math.max(1, cursorColumn -1)
     end
 end
