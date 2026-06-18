@@ -80,7 +80,13 @@ function love.keypressed(key)
         if #lines > 1 and lines[cursorLine] == "" then
             table.remove(lines, cursorLine)
         end
-        lines[#lines] = lines[#lines]:sub(1,-2)
+        --[[
+            This line below this comment is a BETA.
+            WE are re assigning lines[#lines] (could be "hello") to a lines[#lines] that has it's second to last end removed.
+            I DONT KNOW HOW HOW TO TELL IT TO REMOVE WHERE THE cursorColumn IS.
+        ]]--
+        lines[#lines] = lines[#lines]:sub(1, -2)
+        
         cursorColumn = math.max(1, cursorColumn -1)
         cursorLine = math.max(1, cursorLine -1)
     end
