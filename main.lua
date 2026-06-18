@@ -34,7 +34,7 @@ function love.draw()
     love.graphics.setFont(font)
 
     local lastLine = lines[#lines]
-    -- draw the text
+    -- draw the text from lines
     for i, line in ipairs(lines) do
         love.graphics.print(
             line,
@@ -57,11 +57,14 @@ function love.draw()
 
     love.graphics.pop()
 
-    love.graphics.setFont(debugFont)
-    love.graphics.setColor(0,1,0,1)
-    love.graphics.print("Cursor Line: ".. cursorLine, 10, love.graphics.getHeight() - 20)
-    love.graphics.print("Cursor Column: ".. cursorColumn, 10, love.graphics.getHeight() - 30)
-    love.graphics.print("Position: ".. position, 10, love.graphics.getHeight() - 45)
+    -- bunch of debugging stuff
+    if debugging then
+        love.graphics.setFont(debugFont)
+        love.graphics.setColor(0,1,0,1)
+        love.graphics.print("Cursor Line: ".. cursorLine, 10, love.graphics.getHeight() - 20)
+        love.graphics.print("Cursor Column: ".. cursorColumn, 10, love.graphics.getHeight() - 30)
+        love.graphics.print("Position: ".. position, 10, love.graphics.getHeight() - 45)
+    end
 end
 
 function love.textinput(t)
@@ -77,26 +80,21 @@ end
 
 function love.keypressed(key)
     if key == "backspace" then
-        local line = lines[cursorLine] --whats up my "savior"?
-        if #lines > 1 and lines[cursorLine] == "" then
-            table.remove(lines, cursorLine)
-        end
-        --[[
-            This line below this comment is a BETA.
-            We make a new lines[#lines] that is modified with the
-                `:sub(1, -2)`
-            AND then replacing the old lines[#lines] with that one we just made.
-            THE PROBLEM IS THAT IT REMOVES THE LAST CHARACTER OF THE STRING (lines[#lines] could be like "hello")
-            I DONT KNOW HOW HOW TO TELL IT TO REMOVE WHERE THE cursorColumn IS.
+        local line = lines[cursorLine]
 
-            YAY ITS FIXED
-        ]]--
-        local left = line:sub(1, cursorColumn - 2)
-        local right = line:sub(cursorColumn)
-        lines[#lines] = left .. right
-        
-        cursorColumn = math.max(1, cursorColumn -1)
-        cursorLine = math.max(1, cursorLine -1)
+        if cursorColumn > 1 then
+            local left = line:sub(1, cursorColumn - 2)
+            local right = line:sub(cursorColumn)
+
+            lines[cursorLine] = left .. right
+            cursorColumn = cursorColumn - 1
+        end
+
+        if cursorLine ~= 1 then
+            table.remove(lines, cursorLine)
+            cursorLine = cursorLine - 1
+            cursorColumn = #lines[cursorLine] + 1
+        end
     end
     if key == "return" then
         table.insert(lines, "")
