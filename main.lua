@@ -1,6 +1,6 @@
 lines = {""}
 cursorLine = #lines
-cursorColumn = #lines[#lines] + 1
+cursorColumn = #lines[cursorLine] + 1
 cameraX = 0
 cameraY = 0
 
@@ -11,19 +11,16 @@ function love.load()
     debugFont = love.graphics.newFont("JetBrainsMonoNerdFontMono-Regular.ttf", 10)
 end
 function love.update(dt)
-    local lastLine = lines[#lines]
-    local caretX = font:getWidth(lastLine)
-    local caretY = font:getHeight(lastLine)
+    local caretX = font:getWidth(lines[cursorLine] or "")
 
     local screenWidth = love.graphics.getWidth()
-    local screenHeight = love.graphics.getHeight()
 
     if caretX - cameraX > screenWidth - 50 then
         cameraX = caretX - (screenWidth - 50)
     end
 
     if caretX - cameraX < 50 then
-        cameraX = math.max(0, font:getWidth(lines[#lines]) - love.graphics.getWidth() + 100)
+        cameraX = math.max(0, font:getWidth(lines[cursorLine]) - love.graphics.getWidth() + 100)
     end
 
     position = cursorLine.. ",".. cursorColumn
@@ -79,27 +76,38 @@ function love.textinput(t)
 end
 
 function love.keypressed(key)
+    local line = lines[cursorLine]
     if key == "backspace" then
-        if #lines > 1 and lines[#lines] == "" then
-            table.remove(lines)
+        if #lines > 1 and lines[cursorLine] == "" then
+            table.remove(lines, cursorLine)
         end
-        lines[#lines] = lines[#lines]:sub(1, -2)
+        lines[#lines] = lines[#lines]:sub(1,-2)
         cursorColumn = math.max(1, cursorColumn -1)
+        cursorLine = math.max(1, cursorLine -1)
     end
     if key == "return" then
         table.insert(lines, "")
         cursorLine = #lines
+        
+        local line = lines[cursorLine]
+        cursorColumn = math.min(cursorColumn, #line + 1)
     end
     if key == 'left' then
         cursorColumn = math.max(1, cursorColumn -1)
     end
     if key == 'right' then
-        cursorColumn = math.max(1, cursorColumn + 1)
+        cursorColumn = math.min(#line + 1, cursorColumn + 1)
     end
     if key == 'up' then
-        cursorLine = math.max(1, cursorColumn - 1)
+        cursorLine = math.max(1, cursorLine - 1)
+
+        local line = lines[cursorLine]
+        cursorColumn = math.min(cursorColumn, #line + 1)
     end
-    if key == 'down' then
+    if key == 'down' and cursorLine ~= #lines then
         cursorLine = math.max(1, cursorLine + 1)
+
+        local line = lines[cursorLine]
+        cursorColumn = math.min(cursorColumn, #line + 1)
     end
 end
