@@ -81,21 +81,24 @@ end
 function love.keypressed(key)
     if key == "backspace" then
         local line = lines[cursorLine]
-
+        -- Char deletion
         if cursorColumn > 1 then
-            local left = line:sub(1, cursorColumn - 2)
-            local right = line:sub(cursorColumn)
+            local left = line:sub(1, cursorColumn - 2) -- everything before the caret (to the left of the cursor)
+            local right = line:sub(cursorColumn) -- everything after the caret (to the right of the cursor)
 
-            lines[cursorLine] = left .. right
-            cursorColumn = cursorColumn - 1
+            lines[cursorLine] = left .. right -- change the line to the new one
+            cursorColumn = cursorColumn - 1 -- move the caret
         end
 
-        if cursorLine ~= 1 then
+        -- Line deletion
+        if cursorLine > 1 and cursorColumn <= 1 then -- if theres more than 1 cursorLine and cursorColumn is less than or equal to 1, delete the line.
             table.remove(lines, cursorLine)
             cursorLine = cursorLine - 1
             cursorColumn = #lines[cursorLine] + 1
         end
     end
+
+    
     if key == "return" then
         table.insert(lines, "")
         cursorLine = #lines
