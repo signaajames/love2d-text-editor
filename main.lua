@@ -35,7 +35,6 @@ function love.draw()
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.setFont(font)
 
-    local lastLine = lines[#lines]
     -- draw the text from lines
     for i, line in ipairs(lines) do
         love.graphics.print(
@@ -63,11 +62,12 @@ function love.draw()
     if debugging then
         love.graphics.setFont(debugFont)
         love.graphics.setColor(0,1,0,1)
-        love.graphics.print("Cursor Line: ".. cursorLine, 10, love.graphics.getHeight() - 20)
-        love.graphics.print("Cursor Column: ".. cursorColumn, 10, love.graphics.getHeight() - 30)
-        love.graphics.print("Position: ".. position, 10, love.graphics.getHeight() - 40)
-        love.graphics.print("Line Deletion Status: ".. lineDeletionStatus, 10, love.graphics.getHeight() - 50)
-        love.graphics.print("Line Deletion Right: ".. lineDeletionRight, 10, love.graphics.getHeight() - 60)
+        love.graphics.print("Cursor Pos: ".. position, 10, love.graphics.getHeight() - 20)
+        love.graphics.print("Cursor Line: ".. cursorLine, 10, love.graphics.getHeight() - 30)
+        love.graphics.print("Cursor Line Content: ".. lines[cursorLine], 10, love.graphics.getHeight() - 40)
+        love.graphics.print("Cursor Column: ".. cursorColumn, 10, love.graphics.getHeight() - 50)
+        love.graphics.print("Line Deletion Status: ".. lineDeletionStatus, 150, love.graphics.getHeight() - 30)
+        love.graphics.print("Content on Line Deletion Right: ".. lineDeletionRight, 150, love.graphics.getHeight() - 20)
     end
 end
 
