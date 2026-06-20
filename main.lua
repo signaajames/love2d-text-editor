@@ -162,7 +162,7 @@ function love.keypressed(key)
             lineReturnLeft = left
             
             lines[cursorLine] = left
-            table.insert(lines, right)
+            table.insert(lines, cursorLine + 1, right)
             cursorLine = cursorLine + 1
             cursorColumn = 1
         end
