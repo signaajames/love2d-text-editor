@@ -5,13 +5,13 @@ position = nil
 cameraX = 0
 cameraY = 0
 DeletionStatus = 'nil'
-lineDeletionRight = '...'
-
+upArrowStatus = 'nil'
 lineReturnStatus = 'nil'
+
+lineDeletionRight = '...'
 lineReturnRight = '...'
 lineReturnLeft = '...'
 
-upArrowStatus = '...'
 
 function love.load()
     font = love.graphics.newFont("JetBrainsMonoNerdFontMono-Regular.ttf", 64)
@@ -84,33 +84,39 @@ function love.draw()
     -- bunch of debugging stuff
     if debugging then
         love.graphics.setFont(debugFont)
+
+        --Basic Lines
         love.graphics.setColor(0,1,0,1)
         love.graphics.print("Pos: ".. position, 10, love.graphics.getHeight() - 20)
         love.graphics.print("cursorLine: ".. cursorLine, 10, love.graphics.getHeight() - 30)
         love.graphics.print("Cursor Line Content: ".. lines[cursorLine], 10, love.graphics.getHeight() - 40)
         love.graphics.print("cursorColumn: ".. cursorColumn, 10, love.graphics.getHeight() - 50)
         love.graphics.print("Total Lines: ".. #lines, 10, love.graphics.getHeight() - 60)
-        --second part
-        love.graphics.setColor(0,0.6,0,1)
-        love.graphics.print("Line Deletion Right: ".. lineDeletionRight, 150, love.graphics.getHeight() - 20)
-        love.graphics.print("Deletion Status: ".. DeletionStatus, 150, love.graphics.getHeight() - 30)
-        love.graphics.print("LineReturn Status: ".. lineReturnStatus, 150, love.graphics.getHeight() - 50)
-        love.graphics.print("Line Return Right: ".. lineReturnRight, 150, love.graphics.getHeight() - 60)
-        love.graphics.print("Line Return Left: ".. lineReturnLeft, 150, love.graphics.getHeight() - 70)
-        --third part
+        --Advanced Lines
         love.graphics.setColor(0.5,0.8,0,1)
-        love.graphics.print("Cursor Offset Y: ".. caretY, 400, love.graphics.getHeight() - 20)
-        love.graphics.print("Line Width: ".. caretX, 400, love.graphics.getHeight() - 30)
-        --fourth part
+        love.graphics.print("Line Width: ".. caretX, 150, love.graphics.getHeight() - 20)
+        love.graphics.print("lineDeletionRight: ".. lineDeletionRight, 150, love.graphics.getHeight() - 30)
+        love.graphics.print("lineReturnRight: ".. lineReturnRight, 150, love.graphics.getHeight() - 50)
+        love.graphics.print("lineReturnLeft: ".. lineReturnLeft, 150, love.graphics.getHeight() - 60)
+
+        --Statuses
+        love.graphics.setColor(0,0.6,0,1)
+        love.graphics.print("Deletion Status: ".. DeletionStatus, 340, love.graphics.getHeight() - 20)
+        love.graphics.print("LineReturn Status: ".. lineReturnStatus, 340, love.graphics.getHeight() - 30)
+        love.graphics.print("UpArrow Status: ".. upArrowStatus, 340, love.graphics.getHeight() - 40)
+
+        --Cursor stuff
         love.graphics.setColor(0,0.8,0,1)
-        love.graphics.print("UpArrow Status: ".. upArrowStatus, 550, love.graphics.getHeight() - 20)
-        --fifth part
+        love.graphics.print("Cursor Offset Y: ".. caretY, 550, love.graphics.getHeight() - 20)
+        love.graphics.print("Cursor Screen X: ".. (cursorX - cameraX), 550, love.graphics.getHeight() - 30)
+        love.graphics.print("Cursor Screen Y: ".. (cursorY - cameraY), 550, love.graphics.getHeight() - 40)
+
+        --Camera
         love.graphics.setColor(0,0.6,0,1)
         love.graphics.print("Camera X: ".. cameraX, 800, love.graphics.getHeight() - 20)
         love.graphics.print("Camera Y: ".. cameraY, 800, love.graphics.getHeight() - 30)
-        love.graphics.print("Cursor Screen X: ".. (cursorX - cameraX), 800, love.graphics.getHeight() - 40)
-        love.graphics.print("Cursor Screen Y: ".. (cursorY - cameraY), 800, love.graphics.getHeight() - 50)
-        --last part
+
+        --Screen part
         love.graphics.setColor(0,0.6,0,1)
         love.graphics.print("Screen Height: ".. screenHeight, screenWidth - 120, love.graphics.getHeight() - 20)
         love.graphics.print("Screen Width: ".. screenWidth, screenWidth - 120, love.graphics.getHeight() - 30)
