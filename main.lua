@@ -152,8 +152,7 @@ function love.keypressed(key)
             table.insert(lines, "") -- add a new empty table
             cursorLine = cursorLine + 1 -- set the current line to the length of the lines table (bug rn)
         
-            local line = lines[cursorLine]
-            cursorColumn = math.min(cursorColumn, #line + 1) -- set the cursorColumn to the end of the new line
+            cursorColumn = math.min(cursorColumn, #lines[cursorLine] + 1) -- set the cursorColumn to the end of the new line
         elseif cursorColumn ~= #lines[cursorLine] + 1 then -- if the cursorColumn is not at the end of the current line
             lineReturnStatus = 'seperating'
 
@@ -163,7 +162,7 @@ function love.keypressed(key)
             lineReturnLeft = left
             
             lines[cursorLine] = left
-            table.insert(lines, "" .. right)
+            table.insert(lines, right)
             cursorLine = cursorLine + 1
             cursorColumn = 1
         end
