@@ -1,11 +1,14 @@
 lines = {""}
 cursorLine = #lines
 cursorColumn = #lines[cursorLine] + 1
+position = nil
 cameraX = 0
 cameraY = 0
 lineDeletionStatus = 'nil'
 lineDeletionRight = '...'
-position = nil
+lineReturnStatus = 'nil'
+lineReturnRight = '...'
+lineReturnLeft = '...'
 
 function love.load()
     font = love.graphics.newFont("JetBrainsMonoNerdFontMono-Regular.ttf", 64)
@@ -87,6 +90,9 @@ function love.draw()
         love.graphics.setColor(0,0.8,0,1)
         love.graphics.print("Content on Line Deletion Right: ".. lineDeletionRight, 150, love.graphics.getHeight() - 20)
         love.graphics.print("Line Deletion Status: ".. lineDeletionStatus, 150, love.graphics.getHeight() - 30)
+        love.graphics.print("Line Return Status: ".. lineReturnStatus, 150, love.graphics.getHeight() - 50)
+        love.graphics.print("Content on Line Return Right: ".. lineReturnRight, 150, love.graphics.getHeight() - 60)
+        love.graphics.print("Content on Line Return Left: ".. lineReturnLeft, 150, love.graphics.getHeight() - 70)
         --third part
         love.graphics.setColor(0,0.6,0,1)
         love.graphics.print("Screen Height: ".. screenHeight, screenWidth - 120, love.graphics.getHeight() - 20)
@@ -119,8 +125,8 @@ function love.keypressed(key)
         end
 
         -- Line deletion
-        if cursorLine > 1 and cursorColumn == 1 and #line > 1 then
-            lineDeletionStatus = "new"
+        if cursorLine > 1 and cursorColumn == 1 and #line >= 1 then -- if theres more than 1 cursorLine and the cursorColumn is at the start and the current line's content is equal to or greater than 1..
+            lineDeletionStatus = "merging"
             local right = line:sub(cursorColumn)
             lineDeletionRight = right
 
@@ -136,15 +142,31 @@ function love.keypressed(key)
             cursorColumn = #lines[cursorLine] + 1
         end
     end
-
     
     if key == "return" then
-        table.insert(lines, "")
-        cursorLine = #lines
-        
         local line = lines[cursorLine]
-        cursorColumn = math.min(cursorColumn, #line + 1)
+        if cursorColumn == #lines[cursorLine] + 1 then -- if the cursorColumn is at the end of the current line
+            lineReturnStatus = 'casual'
+            table.insert(lines, "") -- add a new empty table
+            cursorLine = #lines -- set the current line to the length of the lines table (bug rn)
+        
+            local line = lines[cursorLine]
+            cursorColumn = math.min(cursorColumn, #line + 1) -- set the cursorColumn to the end of the new line
+        elseif cursorColumn ~= #lines[cursorLine] + 1 then -- if the cursorColumn is not at the end of the current line
+            lineReturnStatus = 'seperating'
+
+            local left = line:sub(1, cursorColumn - 1)
+            local right = line:sub(cursorColumn)
+            lineReturnRight = right
+            lineReturnLeft = left
+            
+            lines[cursorLine] = left
+            table.insert(lines, "" .. right)
+            cursorLine = cursorLine + 1
+            cursorColumn = 1
+        end
     end
+
     -- deal with moving left in a line
     if key == 'left' then
         cursorColumn = math.max(1, cursorColumn -1)
