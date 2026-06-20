@@ -29,6 +29,7 @@ function love.update(dt)
     screenHeight = love.graphics.getHeight()
 
     -- this deals with moving the camera forwards
+    -- TODO: Fix cameraX
     if caretX - cameraX > screenWidth - 50 then
         cameraX = caretX - (screenWidth - 50)
     end
