@@ -89,6 +89,7 @@ function love.draw()
         love.graphics.print("cursorLine: ".. cursorLine, 10, love.graphics.getHeight() - 30)
         love.graphics.print("Cursor Line Content: ".. lines[cursorLine], 10, love.graphics.getHeight() - 40)
         love.graphics.print("cursorColumn: ".. cursorColumn, 10, love.graphics.getHeight() - 50)
+        love.graphics.print("Total Lines: ".. #lines, 10, love.graphics.getHeight() - 60)
         --second part
         love.graphics.setColor(0,0.6,0,1)
         love.graphics.print("Line Deletion Right: ".. lineDeletionRight, 150, love.graphics.getHeight() - 20)
@@ -103,7 +104,12 @@ function love.draw()
         --fourth part
         love.graphics.setColor(0,0.8,0,1)
         love.graphics.print("UpArrow Status: ".. upArrowStatus, 550, love.graphics.getHeight() - 20)
-        
+        --fifth part
+        love.graphics.setColor(0,0.6,0,1)
+        love.graphics.print("Camera X: ".. cameraX, 800, love.graphics.getHeight() - 20)
+        love.graphics.print("Camera Y: ".. cameraY, 800, love.graphics.getHeight() - 30)
+        love.graphics.print("Cursor Screen X: ".. (cursorX - cameraX), 800, love.graphics.getHeight() - 40)
+        love.graphics.print("Cursor Screen Y: ".. (cursorY - cameraY), 800, love.graphics.getHeight() - 50)
         --last part
         love.graphics.setColor(0,0.6,0,1)
         love.graphics.print("Screen Height: ".. screenHeight, screenWidth - 120, love.graphics.getHeight() - 20)
