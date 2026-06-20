@@ -5,6 +5,7 @@ cameraX = 0
 cameraY = 0
 lineDeletionStatus = 'nil'
 lineDeletionRight = '...'
+position = nil
 
 function love.load()
     font = love.graphics.newFont("JetBrainsMonoNerdFontMono-Regular.ttf", 64)
@@ -14,23 +15,38 @@ function love.load()
 end
 function love.update(dt)
     local caretX = font:getWidth(lines[cursorLine] or "")
+    caretY = #lines * font:getHeight() -- could be like 84 if theres 1 line, or 252 if theres 3
+    local lineheight = font:getHeight()
 
-    local screenWidth = love.graphics.getWidth()
+    screenWidth = love.graphics.getWidth()
+    screenHeight = love.graphics.getHeight()
 
+    -- this deals with moving the camera forwards
     if caretX - cameraX > screenWidth - 50 then
         cameraX = caretX - (screenWidth - 50)
     end
-
+    -- this deals with moving the camera backwards
     if caretX - cameraX < 50 then
         cameraX = math.max(0, font:getWidth(lines[cursorLine]) - love.graphics.getWidth() + 100)
     end
 
+    -- this deals with moving the camera downwards
+    if caretY - cameraY > screenHeight - lineheight then
+        cameraY = caretY - (screenHeight - lineheight)
+    end
+    -- this deals with moving the camera upwards
+    if caretY - cameraY < lineheight * 2 then
+        cameraY = math.max(0, caretY - screenHeight + 100)
+    end
+
+    -- for debugging
     position = cursorLine.. ",".. cursorColumn
 end
 
 function love.draw()
     love.graphics.push()
     love.graphics.translate(-cameraX, 0)
+    love.graphics.translate(0, -cameraY)
     
     love.graphics.setColor(1, 1, 1, 1)
     love.graphics.setFont(font)
@@ -66,8 +82,15 @@ function love.draw()
         love.graphics.print("Cursor Line: ".. cursorLine, 10, love.graphics.getHeight() - 30)
         love.graphics.print("Cursor Line Content: ".. lines[cursorLine], 10, love.graphics.getHeight() - 40)
         love.graphics.print("Cursor Column: ".. cursorColumn, 10, love.graphics.getHeight() - 50)
-        love.graphics.print("Line Deletion Status: ".. lineDeletionStatus, 150, love.graphics.getHeight() - 30)
+        love.graphics.print("Total Height: ".. caretY, 10, love.graphics.getHeight() - 60)
+        --second part
+        love.graphics.setColor(0,0.8,0,1)
         love.graphics.print("Content on Line Deletion Right: ".. lineDeletionRight, 150, love.graphics.getHeight() - 20)
+        love.graphics.print("Line Deletion Status: ".. lineDeletionStatus, 150, love.graphics.getHeight() - 30)
+        --third part
+        love.graphics.setColor(0,0.6,0,1)
+        love.graphics.print("Screen Height: ".. screenHeight, screenWidth - 120, love.graphics.getHeight() - 20)
+        love.graphics.print("Screen Width: ".. screenWidth, screenWidth - 120, love.graphics.getHeight() - 30)
     end
 end
 
