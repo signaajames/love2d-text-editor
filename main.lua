@@ -3,6 +3,8 @@ cursorLine = #lines
 cursorColumn = #lines[cursorLine] + 1
 cameraX = 0
 cameraY = 0
+lineDeletionStatus = 'nil'
+lineDeletionRight = '...'
 
 function love.load()
     font = love.graphics.newFont("JetBrainsMonoNerdFontMono-Regular.ttf", 64)
@@ -63,7 +65,9 @@ function love.draw()
         love.graphics.setColor(0,1,0,1)
         love.graphics.print("Cursor Line: ".. cursorLine, 10, love.graphics.getHeight() - 20)
         love.graphics.print("Cursor Column: ".. cursorColumn, 10, love.graphics.getHeight() - 30)
-        love.graphics.print("Position: ".. position, 10, love.graphics.getHeight() - 45)
+        love.graphics.print("Position: ".. position, 10, love.graphics.getHeight() - 40)
+        love.graphics.print("Line Deletion Status: ".. lineDeletionStatus, 10, love.graphics.getHeight() - 50)
+        love.graphics.print("Line Deletion Right: ".. lineDeletionRight, 10, love.graphics.getHeight() - 60)
     end
 end
 
@@ -78,6 +82,7 @@ function love.textinput(t)
     cursorColumn = cursorColumn + #t
 end
 
+
 function love.keypressed(key)
     if key == "backspace" then
         local line = lines[cursorLine]
@@ -91,7 +96,18 @@ function love.keypressed(key)
         end
 
         -- Line deletion
-        if cursorLine > 1 and cursorColumn <= 1 then -- if theres more than 1 cursorLine and cursorColumn is less than or equal to 1, delete the line.
+        if cursorLine > 1 and cursorColumn == 1 and #line > 1 then
+            lineDeletionStatus = "new"
+            local right = line:sub(cursorColumn)
+            lineDeletionRight = right
+
+            table.remove(lines, cursorLine)
+            cursorLine = cursorLine - 1
+            cursorColumn = #lines[cursorLine] + 1
+            
+            lines[cursorLine] = lines[cursorLine] .. right
+        elseif cursorLine > 1 and cursorColumn <= 1 then -- if theres more than 1 cursorLine and cursorColumn is less than or equal to 1, delete the line.
+            lineDeletionStatus = 'casual'
             table.remove(lines, cursorLine)
             cursorLine = cursorLine - 1
             cursorColumn = #lines[cursorLine] + 1
