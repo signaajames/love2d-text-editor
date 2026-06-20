@@ -6,9 +6,12 @@ cameraX = 0
 cameraY = 0
 DeletionStatus = 'nil'
 lineDeletionRight = '...'
+
 lineReturnStatus = 'nil'
 lineReturnRight = '...'
 lineReturnLeft = '...'
+
+upArrowStatus = '...'
 
 function love.load()
     font = love.graphics.newFont("JetBrainsMonoNerdFontMono-Regular.ttf", 64)
@@ -17,9 +20,10 @@ function love.load()
     debugFont = love.graphics.newFont("JetBrainsMonoNerdFontMono-Regular.ttf", 10)
 end
 function love.update(dt)
-    local caretX = font:getWidth(lines[cursorLine] or "")
-    caretY = #lines * font:getHeight() -- could be like 84 if theres 1 line, or 252 if theres 3
-    local lineheight = font:getHeight()
+    -- global so i can use them in debugging
+    caretX = font:getWidth(lines[cursorLine] or "")
+    caretY = (cursorLine - 1) * font:getHeight()
+    generalLineHeight = font:getHeight()
 
     screenWidth = love.graphics.getWidth()
     screenHeight = love.graphics.getHeight()
@@ -34,11 +38,11 @@ function love.update(dt)
     end
 
     -- this deals with moving the camera downwards
-    if caretY - cameraY > screenHeight - lineheight then
-        cameraY = caretY - (screenHeight - lineheight)
+    if caretY - cameraY > screenHeight - generalLineHeight then
+        cameraY = caretY - (screenHeight - generalLineHeight)
     end
     -- this deals with moving the camera upwards
-    if caretY - cameraY < lineheight * 2 then
+    if caretY - cameraY < generalLineHeight * 2 then
         cameraY = math.max(0, caretY - screenHeight + 100)
     end
 
@@ -81,19 +85,26 @@ function love.draw()
     if debugging then
         love.graphics.setFont(debugFont)
         love.graphics.setColor(0,1,0,1)
-        love.graphics.print("Cursor Pos: ".. position, 10, love.graphics.getHeight() - 20)
-        love.graphics.print("Cursor Line: ".. cursorLine, 10, love.graphics.getHeight() - 30)
+        love.graphics.print("Pos: ".. position, 10, love.graphics.getHeight() - 20)
+        love.graphics.print("cursorLine: ".. cursorLine, 10, love.graphics.getHeight() - 30)
         love.graphics.print("Cursor Line Content: ".. lines[cursorLine], 10, love.graphics.getHeight() - 40)
-        love.graphics.print("Cursor Column: ".. cursorColumn, 10, love.graphics.getHeight() - 50)
-        love.graphics.print("Total Height: ".. caretY, 10, love.graphics.getHeight() - 60)
+        love.graphics.print("cursorColumn: ".. cursorColumn, 10, love.graphics.getHeight() - 50)
         --second part
-        love.graphics.setColor(0,0.8,0,1)
-        love.graphics.print("Content on Line Deletion Right: ".. lineDeletionRight, 150, love.graphics.getHeight() - 20)
+        love.graphics.setColor(0,0.6,0,1)
+        love.graphics.print("Line Deletion Right: ".. lineDeletionRight, 150, love.graphics.getHeight() - 20)
         love.graphics.print("Deletion Status: ".. DeletionStatus, 150, love.graphics.getHeight() - 30)
-        love.graphics.print("Line Return Status: ".. lineReturnStatus, 150, love.graphics.getHeight() - 50)
-        love.graphics.print("Content on Line Return Right: ".. lineReturnRight, 150, love.graphics.getHeight() - 60)
-        love.graphics.print("Content on Line Return Left: ".. lineReturnLeft, 150, love.graphics.getHeight() - 70)
+        love.graphics.print("LineReturn Status: ".. lineReturnStatus, 150, love.graphics.getHeight() - 50)
+        love.graphics.print("Line Return Right: ".. lineReturnRight, 150, love.graphics.getHeight() - 60)
+        love.graphics.print("Line Return Left: ".. lineReturnLeft, 150, love.graphics.getHeight() - 70)
         --third part
+        love.graphics.setColor(0.5,0.8,0,1)
+        love.graphics.print("Cursor Offset Y: ".. caretY, 400, love.graphics.getHeight() - 20)
+        love.graphics.print("Line Width: ".. caretX, 400, love.graphics.getHeight() - 30)
+        --fourth part
+        love.graphics.setColor(0,0.8,0,1)
+        love.graphics.print("UpArrow Status: ".. upArrowStatus, 550, love.graphics.getHeight() - 20)
+        
+        --last part
         love.graphics.setColor(0,0.6,0,1)
         love.graphics.print("Screen Height: ".. screenHeight, screenWidth - 120, love.graphics.getHeight() - 20)
         love.graphics.print("Screen Width: ".. screenWidth, screenWidth - 120, love.graphics.getHeight() - 30)
@@ -127,7 +138,7 @@ function love.keypressed(key)
         elseif cursorLine > 1 and cursorColumn == 1 then
             -- checked if cursorColumn was not > 1
             if #line >= 1 then
-                DeletionStatus = "Merg"
+                DeletionStatus = "merg"
                 local right = line:sub(cursorColumn)
                 lineDeletionRight = right
             
@@ -137,7 +148,7 @@ function love.keypressed(key)
             
                 lines[cursorLine] = lines[cursorLine] .. right
             else -- if theres more than 1 cursorLine and cursorColumn is less than or equal to 1, delete the line.
-                DeletionStatus = 'Line'
+                DeletionStatus = 'line'
                 table.remove(lines, cursorLine)
                 cursorLine = cursorLine - 1
                 cursorColumn = #lines[cursorLine] + 1
@@ -149,12 +160,12 @@ function love.keypressed(key)
         local line = lines[cursorLine]
         if cursorColumn == #lines[cursorLine] + 1 then -- if the cursorColumn is at the end of the current line
             lineReturnStatus = 'casual'
-            table.insert(lines, "") -- add a new empty table
+            table.insert(lines, cursorLine + 1, "") -- add a new empty table
             cursorLine = cursorLine + 1 -- set the current line to the length of the lines table (bug rn)
         
             cursorColumn = math.min(cursorColumn, #lines[cursorLine] + 1) -- set the cursorColumn to the end of the new line
         elseif cursorColumn ~= #lines[cursorLine] + 1 then -- if the cursorColumn is not at the end of the current line
-            lineReturnStatus = 'seperating'
+            lineReturnStatus = 'seperating' --debugging
 
             local left = line:sub(1, cursorColumn - 1)
             local right = line:sub(cursorColumn)
@@ -179,10 +190,16 @@ function love.keypressed(key)
     end
     -- deal with moving up lines
     if key == 'up' then
-        cursorLine = math.max(1, cursorLine - 1)
-
-        local line = lines[cursorLine]
-        cursorColumn = math.min(cursorColumn, #line + 1)
+        if cursorLine == 1 and cursorColumn ~= 1 then 
+            upArrowStatus = 'start'
+            cursorColumn = 1
+        else
+            upArrowStatus = 'casual'
+            cursorLine = math.max(1, cursorLine - 1)
+            
+            local line = lines[cursorLine]
+            cursorColumn = math.min(cursorColumn, #line + 1)
+        end
     end
     -- deal with moving down lines
     if key == 'down' and cursorLine ~= #lines then
