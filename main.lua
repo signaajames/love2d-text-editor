@@ -4,7 +4,7 @@ cursorColumn = #lines[cursorLine] + 1
 position = nil
 cameraX = 0
 cameraY = 0
-lineDeletionStatus = 'nil'
+DeletionStatus = 'nil'
 lineDeletionRight = '...'
 lineReturnStatus = 'nil'
 lineReturnRight = '...'
@@ -89,7 +89,7 @@ function love.draw()
         --second part
         love.graphics.setColor(0,0.8,0,1)
         love.graphics.print("Content on Line Deletion Right: ".. lineDeletionRight, 150, love.graphics.getHeight() - 20)
-        love.graphics.print("Line Deletion Status: ".. lineDeletionStatus, 150, love.graphics.getHeight() - 30)
+        love.graphics.print("Deletion Status: ".. DeletionStatus, 150, love.graphics.getHeight() - 30)
         love.graphics.print("Line Return Status: ".. lineReturnStatus, 150, love.graphics.getHeight() - 50)
         love.graphics.print("Content on Line Return Right: ".. lineReturnRight, 150, love.graphics.getHeight() - 60)
         love.graphics.print("Content on Line Return Left: ".. lineReturnLeft, 150, love.graphics.getHeight() - 70)
@@ -117,38 +117,40 @@ function love.keypressed(key)
         local line = lines[cursorLine]
         -- Char deletion
         if cursorColumn > 1 then
+            DeletionStatus = "Char"
             local left = line:sub(1, cursorColumn - 2) -- everything before the caret (to the left of the cursor)
             local right = line:sub(cursorColumn) -- everything after the caret (to the right of the cursor)
 
             lines[cursorLine] = left .. right -- change the line to the new one
             cursorColumn = cursorColumn - 1 -- move the caret
-        end
-
-        -- Line deletion
-        if cursorLine > 1 and cursorColumn == 1 and #line >= 1 then -- if theres more than 1 cursorLine and the cursorColumn is at the start and the current line's content is equal to or greater than 1..
-            lineDeletionStatus = "merging"
-            local right = line:sub(cursorColumn)
-            lineDeletionRight = right
-
-            table.remove(lines, cursorLine)
-            cursorLine = cursorLine - 1
-            cursorColumn = #lines[cursorLine] + 1
             
-            lines[cursorLine] = lines[cursorLine] .. right
-        elseif cursorLine > 1 and cursorColumn <= 1 then -- if theres more than 1 cursorLine and cursorColumn is less than or equal to 1, delete the line.
-            lineDeletionStatus = 'casual'
-            table.remove(lines, cursorLine)
-            cursorLine = cursorLine - 1
-            cursorColumn = #lines[cursorLine] + 1
+        elseif cursorLine > 1 and cursorColumn == 1 then
+            -- checked if cursorColumn was not > 1
+            if #line >= 1 then
+                DeletionStatus = "Merg"
+                local right = line:sub(cursorColumn)
+                lineDeletionRight = right
+            
+                table.remove(lines, cursorLine)
+                cursorLine = cursorLine - 1
+                cursorColumn = #lines[cursorLine] + 1
+            
+                lines[cursorLine] = lines[cursorLine] .. right
+            else -- if theres more than 1 cursorLine and cursorColumn is less than or equal to 1, delete the line.
+                DeletionStatus = 'Line'
+                table.remove(lines, cursorLine)
+                cursorLine = cursorLine - 1
+                cursorColumn = #lines[cursorLine] + 1
+            end
         end
     end
-    
+
     if key == "return" then
         local line = lines[cursorLine]
         if cursorColumn == #lines[cursorLine] + 1 then -- if the cursorColumn is at the end of the current line
             lineReturnStatus = 'casual'
             table.insert(lines, "") -- add a new empty table
-            cursorLine = #lines -- set the current line to the length of the lines table (bug rn)
+            cursorLine = cursorLine + 1 -- set the current line to the length of the lines table (bug rn)
         
             local line = lines[cursorLine]
             cursorColumn = math.min(cursorColumn, #line + 1) -- set the cursorColumn to the end of the new line

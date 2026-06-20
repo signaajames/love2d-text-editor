@@ -14,4 +14,5 @@ If you're making a text editor without web technologies, this could help you a l
 - Multi line
 - Line deletion
 - Merging lines
+- Seperating lines
 - debugging info
