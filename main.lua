@@ -4,13 +4,17 @@ cursorColumn = #lines[cursorLine] + 1
 position = nil
 cameraX = 0
 cameraY = 0
-DeletionStatus = 'nil'
+BackspaceStatus = 'nil'
 upArrowStatus = 'nil'
 lineReturnStatus = 'nil'
+delStatus = 'nil'
 
-lineDeletionRight = '...'
+lineBackspaceRight = '...'
+LineDelRight = '...'
 lineReturnRight = '...'
 lineReturnLeft = '...'
+delRight = '...'
+delRightChar = '...'
 
 
 function love.load()
@@ -69,8 +73,7 @@ function love.draw()
         )
     end
     -- draw the caret
-    local beforeCursor = 
-    lines[cursorLine]:sub(1, cursorColumn - 1)
+    local beforeCursor = lines[cursorLine]:sub(1, cursorColumn - 1)
 
     local cursorX = font:getWidth(beforeCursor)
     local cursorY = (cursorLine - 1) * font:getHeight()
@@ -97,15 +100,18 @@ function love.draw()
         --Advanced Lines
         love.graphics.setColor(0.5,0.8,0,1)
         love.graphics.print("Line Width: ".. caretX, 150, love.graphics.getHeight() - 20)
-        love.graphics.print("lineDeletionRight: ".. lineDeletionRight, 150, love.graphics.getHeight() - 30)
+        love.graphics.print("lineBackspaceRight: ".. lineBackspaceRight, 150, love.graphics.getHeight() - 30)
         love.graphics.print("lineReturnRight: ".. lineReturnRight, 150, love.graphics.getHeight() - 50)
         love.graphics.print("lineReturnLeft: ".. lineReturnLeft, 150, love.graphics.getHeight() - 60)
+        love.graphics.print("delRight: ".. delRight, 150, love.graphics.getHeight() - 70)
+        love.graphics.print("delRightChar: ".. delRightChar, 150, love.graphics.getHeight() - 80)
 
         --Statuses
         love.graphics.setColor(0,0.6,0,1)
-        love.graphics.print("Deletion Status: ".. DeletionStatus, 340, love.graphics.getHeight() - 20)
+        love.graphics.print("Deletion Status: ".. BackspaceStatus, 340, love.graphics.getHeight() - 20)
         love.graphics.print("LineReturn Status: ".. lineReturnStatus, 340, love.graphics.getHeight() - 30)
         love.graphics.print("UpArrow Status: ".. upArrowStatus, 340, love.graphics.getHeight() - 40)
+        love.graphics.print("Del Status: ".. delStatus, 340, love.graphics.getHeight() - 50)
 
         --Cursor stuff
         love.graphics.setColor(0,0.8,0,1)
@@ -142,7 +148,7 @@ function love.keypressed(key)
         local line = lines[cursorLine]
         -- Char deletion
         if cursorColumn > 1 then
-            DeletionStatus = "Char"
+            BackspaceStatus = "Char"
             local left = line:sub(1, cursorColumn - 2) -- everything before the caret (to the left of the cursor)
             local right = line:sub(cursorColumn) -- everything after the caret (to the right of the cursor)
 
@@ -152,9 +158,9 @@ function love.keypressed(key)
         elseif cursorLine > 1 and cursorColumn == 1 then
             -- checked if cursorColumn was not > 1
             if #line >= 1 then
-                DeletionStatus = "merg"
+                BackspaceStatus = "merg"
                 local right = line:sub(cursorColumn)
-                lineDeletionRight = right
+                lineBackspaceRight = right
             
                 table.remove(lines, cursorLine)
                 cursorLine = cursorLine - 1
@@ -162,12 +168,22 @@ function love.keypressed(key)
             
                 lines[cursorLine] = lines[cursorLine] .. right
             else -- if theres more than 1 cursorLine and cursorColumn is less than or equal to 1, delete the line.
-                DeletionStatus = 'line'
+                BackspaceStatus = 'line'
                 table.remove(lines, cursorLine)
                 cursorLine = cursorLine - 1
                 cursorColumn = #lines[cursorLine] + 1
             end
         end
+    end
+
+    if key == "delete" then
+        local line = lines[cursorLine]
+        
+        local left = line:sub(1, cursorColumn - 1)
+        local right = line:sub(cursorColumn + 1)
+
+        lines[cursorLine] = left .. right
+
     end
 
     if key == "return" then
