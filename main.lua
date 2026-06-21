@@ -5,9 +5,12 @@ position = nil
 cameraX = 0
 cameraY = 0
 BackspaceStatus = 'nil'
-upArrowStatus = 'nil'
 lineReturnStatus = 'nil'
 delStatus = 'nil'
+leftStatus = 'nil'
+upStatus = 'nil'
+rightStatus = 'nil'
+DownStatus = 'nil'
 
 lineBackspaceRight = '...'
 LineDelRight = '...'
@@ -111,8 +114,11 @@ function love.draw()
         love.graphics.setColor(0,0.6,0,1)
         love.graphics.print("Deletion Status: ".. BackspaceStatus, 340, love.graphics.getHeight() - 20)
         love.graphics.print("LineReturn Status: ".. lineReturnStatus, 340, love.graphics.getHeight() - 30)
-        love.graphics.print("UpArrow Status: ".. upArrowStatus, 340, love.graphics.getHeight() - 40)
-        love.graphics.print("Del Status: ".. delStatus, 340, love.graphics.getHeight() - 50)
+        love.graphics.print("Del Status: ".. delStatus, 340, love.graphics.getHeight() - 40)
+        love.graphics.print("Left Status: ".. leftStatus, 340, love.graphics.getHeight() - 50)
+        love.graphics.print("Right Status: ".. rightStatus, 340, love.graphics.getHeight() - 60)
+        love.graphics.print("Up Status: ".. upStatus, 340, love.graphics.getHeight() - 70)
+        love.graphics.print("Down Status: ".. DownStatus, 340, love.graphics.getHeight() - 80)
 
         --Cursor stuff
         love.graphics.setColor(0,0.8,0,1)
@@ -232,28 +238,32 @@ function love.keypressed(key)
     -- deal with moving left in a line
     if key == 'left' then
         if cursorColumn == 1 and cursorLine ~= 1 then
+            leftStatus = 'up'
             cursorLine = cursorLine - 1 -- move cursorLine up one
             cursorColumn = #lines[cursorLine] + 1
         else
+            leftStatus = 'casual'
             cursorColumn = math.max(1, cursorColumn -1)
         end
     end
     -- deal with moving right in a line
     if key == 'right' then
         if cursorColumn == #lines[cursorLine] + 1 and lines[cursorLine + 1] then
+            rightStatus = 'down'
             cursorLine = cursorLine + 1
             cursorColumn = 1
         else
+            rightStatus = 'casual'
             cursorColumn = math.min(#lines[cursorLine] + 1, cursorColumn + 1)
         end
     end
     -- deal with moving up lines
     if key == 'up' then
         if cursorLine == 1 and cursorColumn ~= 1 then 
-            upArrowStatus = 'start'
+            upStatus = 'start'
             cursorColumn = 1
         else
-            upArrowStatus = 'casual'
+            upStatus = 'casual'
             cursorLine = math.max(1, cursorLine - 1)
             
             local line = lines[cursorLine]
@@ -261,10 +271,16 @@ function love.keypressed(key)
         end
     end
     -- deal with moving down lines
-    if key == 'down' and cursorLine ~= #lines then
-        cursorLine = math.max(1, cursorLine + 1)
-
-        local line = lines[cursorLine]
-        cursorColumn = math.min(cursorColumn, #line + 1)
+    if key == 'down' then
+        if cursorColumn ~= #lines[cursorLine] + 1 and cursorLine == #lines then
+            DownStatus = 'end'
+            cursorColumn = #lines[cursorLine] + 1
+        elseif cursorLine ~= #lines then
+            DownStatus = 'casual'
+            cursorLine = math.max(1, cursorLine + 1)
+            cursorColumn = math.min(cursorColumn, #lines[cursorLine] + 1)
+        else
+            DownStatus = 'huh'
+        end
     end
 end
