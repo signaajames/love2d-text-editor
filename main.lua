@@ -14,7 +14,8 @@ LineDelRight = '...'
 lineReturnRight = '...'
 lineReturnLeft = '...'
 delRight = '...'
-delRightChar = '...'
+delMergContent = "..."
+
 
 
 function love.load()
@@ -104,7 +105,7 @@ function love.draw()
         love.graphics.print("lineReturnRight: ".. lineReturnRight, 150, love.graphics.getHeight() - 50)
         love.graphics.print("lineReturnLeft: ".. lineReturnLeft, 150, love.graphics.getHeight() - 60)
         love.graphics.print("delRight: ".. delRight, 150, love.graphics.getHeight() - 70)
-        love.graphics.print("delRightChar: ".. delRightChar, 150, love.graphics.getHeight() - 80)
+        love.graphics.print("delMergContent: ".. delMergContent, 150, love.graphics.getHeight() - 80)
 
         --Statuses
         love.graphics.setColor(0,0.6,0,1)
@@ -154,18 +155,18 @@ function love.keypressed(key)
 
             lines[cursorLine] = left .. right -- change the line to the new one
             cursorColumn = cursorColumn - 1 -- move the caret
-            
+
         elseif cursorLine > 1 and cursorColumn == 1 then
             -- checked if cursorColumn was not > 1
             if #line >= 1 then
                 BackspaceStatus = "merg"
                 local right = line:sub(cursorColumn)
                 lineBackspaceRight = right
-            
+
                 table.remove(lines, cursorLine)
                 cursorLine = cursorLine - 1
                 cursorColumn = #lines[cursorLine] + 1
-            
+
                 lines[cursorLine] = lines[cursorLine] .. right
             else -- if theres more than 1 cursorLine and cursorColumn is less than or equal to 1, delete the line.
                 BackspaceStatus = 'line'
@@ -178,11 +179,30 @@ function love.keypressed(key)
 
     if key == "delete" then
         local line = lines[cursorLine]
-        
-        local left = line:sub(1, cursorColumn - 1)
-        local right = line:sub(cursorColumn + 1)
-
-        lines[cursorLine] = left .. right
+        if cursorColumn ~= #lines[cursorLine] + 1 then
+            delStatus = 'char'
+            
+            local left = line:sub(1, cursorColumn - 1)
+            local right = line:sub(cursorColumn + 1)
+            
+            lines[cursorLine] = left .. right
+        elseif cursorColumn == #lines[cursorLine] + 1 then -- if cursorColumn is at the end
+            if #lines > 1 and lines[cursorLine + 1] == "" then
+                delStatus = 'line'
+                table.remove(lines, cursorLine + 1)
+            elseif #lines > 1 and lines[cursorLine + 1] ~= "" then
+                delStatus = 'merg'
+                -- take everything in the line below cursorLine
+                local mergContent = lines[cursorLine + 1]
+                delMergContent = mergContent -- the content in the line below cursorLine
+                -- remove that line
+                table.remove(lines, cursorLine + 1)
+                -- add mergContent to the current line after cursorColumn
+                lines[cursorLine] = lines[cursorLine] .. mergContent
+            else
+                delStatus = 'no extra line lil bro LOL'
+            end
+        end
 
     end
 
