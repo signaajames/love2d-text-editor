@@ -240,8 +240,12 @@ function love.keypressed(key)
     end
     -- deal with moving right in a line
     if key == 'right' then
-        local line = lines[cursorLine]
-        cursorColumn = math.min(#lines[cursorLine] + 1, cursorColumn + 1)
+        if cursorColumn == #lines[cursorLine] + 1 and lines[cursorLine + 1] == "" then
+            cursorLine = cursorLine + 1
+            cursorColumn = 1
+        else
+            cursorColumn = math.min(#lines[cursorLine] + 1, cursorColumn + 1)
+        end
     end
     -- deal with moving up lines
     if key == 'up' then
