@@ -21,7 +21,9 @@ function love.load()
 end
 function love.update(dt)
     -- global so i can use them in debugging
-    caretX = font:getWidth(lines[cursorLine] or "")
+    local line = lines[cursorLine] or ""
+    local beforeCursor = line:sub(1, cursorColumn - 1)
+    caretX = font:getWidth(beforeCursor)
     caretY = (cursorLine - 1) * font:getHeight()
     generalLineHeight = font:getHeight()
 
@@ -29,13 +31,12 @@ function love.update(dt)
     screenHeight = love.graphics.getHeight()
 
     -- this deals with moving the camera forwards
-    -- TODO: Fix cameraX
     if caretX - cameraX > screenWidth - 50 then
         cameraX = caretX - (screenWidth - 50)
     end
     -- this deals with moving the camera backwards
     if caretX - cameraX < 50 then
-        cameraX = math.max(0, font:getWidth(lines[cursorLine]) - love.graphics.getWidth() + 100)
+        cameraX = math.max(0, caretX - 50)
     end
 
     -- this deals with moving the camera downwards
@@ -68,7 +69,7 @@ function love.draw()
         )
     end
     -- draw the caret
-    local beforeCursor =
+    local beforeCursor = 
     lines[cursorLine]:sub(1, cursorColumn - 1)
 
     local cursorX = font:getWidth(beforeCursor)
