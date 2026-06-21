@@ -178,7 +178,7 @@ function love.keypressed(key)
     end
 
     if key == "delete" then
-        local line = lines[cursorLine]
+        local line = lines[cursorLine] -- content of the current line
         if cursorColumn ~= #lines[cursorLine] + 1 then
             delStatus = 'char'
             
@@ -231,12 +231,17 @@ function love.keypressed(key)
 
     -- deal with moving left in a line
     if key == 'left' then
-        cursorColumn = math.max(1, cursorColumn -1)
+        if cursorColumn == 1 and cursorLine ~= 1 then
+            cursorLine = cursorLine - 1 -- move cursorLine up one
+            cursorColumn = #lines[cursorLine] + 1
+        else
+            cursorColumn = math.max(1, cursorColumn -1)
+        end
     end
     -- deal with moving right in a line
     if key == 'right' then
         local line = lines[cursorLine]
-        cursorColumn = math.min(#line + 1, cursorColumn + 1)
+        cursorColumn = math.min(#lines[cursorLine] + 1, cursorColumn + 1)
     end
     -- deal with moving up lines
     if key == 'up' then
