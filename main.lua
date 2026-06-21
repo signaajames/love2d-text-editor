@@ -240,7 +240,7 @@ function love.keypressed(key)
     end
     -- deal with moving right in a line
     if key == 'right' then
-        if cursorColumn == #lines[cursorLine] + 1 and lines[cursorLine + 1] == "" then
+        if cursorColumn == #lines[cursorLine] + 1 and lines[cursorLine + 1] then
             cursorLine = cursorLine + 1
             cursorColumn = 1
         else
