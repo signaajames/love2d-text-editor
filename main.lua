@@ -1,26 +1,3 @@
-lines = {""}
-cursorLine = #lines
-cursorColumn = #lines[cursorLine] + 1
-position = nil
-cameraX = 0
-cameraY = 0
-BackspaceStatus = 'nil'
-LineReturnStatus = 'nil'
-DelStatus = 'nil'
-LeftStatus = 'nil'
-UpStatus = 'nil'
-RightStatus = 'nil'
-DownStatus = 'nil'
-
-LineBackspaceRight = '...'
-LineDelRight = '...'
-LineReturnRight = '...'
-LineReturnLeft = '...'
-DelRight = '...'
-DelMergContent = "..."
-
-
-
 function love.load()
     font = love.graphics.newFont("JetBrainsMonoNerdFontMono-Regular.ttf", 64)
     love.graphics.setFont(font)
@@ -57,7 +34,7 @@ function love.update(dt)
     end
 
     -- for debugging
-    position = cursorLine.. ",".. cursorColumn
+    position = cursorLine.. "," .. cursorColumn
 end
 
 function love.draw()
