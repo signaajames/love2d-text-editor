@@ -5,19 +5,19 @@ position = nil
 cameraX = 0
 cameraY = 0
 BackspaceStatus = 'nil'
-lineReturnStatus = 'nil'
-delStatus = 'nil'
-leftStatus = 'nil'
-upStatus = 'nil'
-rightStatus = 'nil'
+LineReturnStatus = 'nil'
+DelStatus = 'nil'
+LeftStatus = 'nil'
+UpStatus = 'nil'
+RightStatus = 'nil'
 DownStatus = 'nil'
 
-lineBackspaceRight = '...'
+LineBackspaceRight = '...'
 LineDelRight = '...'
-lineReturnRight = '...'
-lineReturnLeft = '...'
-delRight = '...'
-delMergContent = "..."
+LineReturnRight = '...'
+LineReturnLeft = '...'
+DelRight = '...'
+DelMergContent = "..."
 
 
 
@@ -104,20 +104,20 @@ function love.draw()
         --Advanced Lines
         love.graphics.setColor(0.5,0.8,0,1)
         love.graphics.print("Line Width: ".. caretX, 150, love.graphics.getHeight() - 20)
-        love.graphics.print("lineBackspaceRight: ".. lineBackspaceRight, 150, love.graphics.getHeight() - 30)
-        love.graphics.print("lineReturnRight: ".. lineReturnRight, 150, love.graphics.getHeight() - 50)
-        love.graphics.print("lineReturnLeft: ".. lineReturnLeft, 150, love.graphics.getHeight() - 60)
-        love.graphics.print("delRight: ".. delRight, 150, love.graphics.getHeight() - 70)
-        love.graphics.print("delMergContent: ".. delMergContent, 150, love.graphics.getHeight() - 80)
+        love.graphics.print("LineBackspaceRight: ".. LineBackspaceRight, 150, love.graphics.getHeight() - 30)
+        love.graphics.print("LineReturnRight: ".. LineReturnRight, 150, love.graphics.getHeight() - 50)
+        love.graphics.print("LineReturnLeft: ".. LineReturnLeft, 150, love.graphics.getHeight() - 60)
+        love.graphics.print("DelRight: ".. DelRight, 150, love.graphics.getHeight() - 70)
+        love.graphics.print("DelMergContent: ".. DelMergContent, 150, love.graphics.getHeight() - 80)
 
         --Statuses
         love.graphics.setColor(0,0.6,0,1)
         love.graphics.print("Deletion Status: ".. BackspaceStatus, 340, love.graphics.getHeight() - 20)
-        love.graphics.print("LineReturn Status: ".. lineReturnStatus, 340, love.graphics.getHeight() - 30)
-        love.graphics.print("Del Status: ".. delStatus, 340, love.graphics.getHeight() - 40)
-        love.graphics.print("Left Status: ".. leftStatus, 340, love.graphics.getHeight() - 50)
-        love.graphics.print("Right Status: ".. rightStatus, 340, love.graphics.getHeight() - 60)
-        love.graphics.print("Up Status: ".. upStatus, 340, love.graphics.getHeight() - 70)
+        love.graphics.print("LineReturn Status: ".. LineReturnStatus, 340, love.graphics.getHeight() - 30)
+        love.graphics.print("Del Status: ".. DelStatus, 340, love.graphics.getHeight() - 40)
+        love.graphics.print("Left Status: ".. LeftStatus, 340, love.graphics.getHeight() - 50)
+        love.graphics.print("Right Status: ".. RightStatus, 340, love.graphics.getHeight() - 60)
+        love.graphics.print("Up Status: ".. UpStatus, 340, love.graphics.getHeight() - 70)
         love.graphics.print("Down Status: ".. DownStatus, 340, love.graphics.getHeight() - 80)
 
         --Cursor stuff
@@ -167,7 +167,7 @@ function love.keypressed(key)
             if #line >= 1 then
                 BackspaceStatus = "merg"
                 local right = line:sub(cursorColumn)
-                lineBackspaceRight = right
+                LineBackspaceRight = right
 
                 table.remove(lines, cursorLine)
                 cursorLine = cursorLine - 1
@@ -186,7 +186,7 @@ function love.keypressed(key)
     if key == "delete" then
         local line = lines[cursorLine] -- content of the current line
         if cursorColumn ~= #lines[cursorLine] + 1 then
-            delStatus = 'char'
+            DelStatus = 'char'
             
             local left = line:sub(1, cursorColumn - 1)
             local right = line:sub(cursorColumn + 1)
@@ -194,19 +194,19 @@ function love.keypressed(key)
             lines[cursorLine] = left .. right
         elseif cursorColumn == #lines[cursorLine] + 1 then -- if cursorColumn is at the end
             if #lines > 1 and lines[cursorLine + 1] == "" then
-                delStatus = 'line'
+                DelStatus = 'line'
                 table.remove(lines, cursorLine + 1)
             elseif #lines > 1 and lines[cursorLine + 1] ~= "" then
-                delStatus = 'merg'
+                DelStatus = 'merg'
                 -- take everything in the line below cursorLine
                 local mergContent = lines[cursorLine + 1]
-                delMergContent = mergContent -- the content in the line below cursorLine
+                DelMergContent = mergContent -- the content in the line below cursorLine
                 -- remove that line
                 table.remove(lines, cursorLine + 1)
                 -- add mergContent to the current line after cursorColumn
                 lines[cursorLine] = lines[cursorLine] .. mergContent
             else
-                delStatus = 'no extra line lil bro LOL'
+                DelStatus = 'no extra line lil bro LOL'
             end
         end
 
@@ -215,18 +215,18 @@ function love.keypressed(key)
     if key == "return" then
         local line = lines[cursorLine]
         if cursorColumn == #lines[cursorLine] + 1 then -- if the cursorColumn is at the end of the current line
-            lineReturnStatus = 'casual'
+            LineReturnStatus = 'casual'
             table.insert(lines, cursorLine + 1, "") -- add a new empty table
             cursorLine = cursorLine + 1 -- set the current line to the length of the lines table (bug rn)
         
             cursorColumn = math.min(cursorColumn, #lines[cursorLine] + 1) -- set the cursorColumn to the end of the new line
         elseif cursorColumn ~= #lines[cursorLine] + 1 then -- if the cursorColumn is not at the end of the current line
-            lineReturnStatus = 'seperating' --debugging
+            LineReturnStatus = 'seperating' --debugging
 
             local left = line:sub(1, cursorColumn - 1)
             local right = line:sub(cursorColumn)
-            lineReturnRight = right
-            lineReturnLeft = left
+            LineReturnRight = right
+            LineReturnLeft = left
             
             lines[cursorLine] = left
             table.insert(lines, cursorLine + 1, right)
@@ -238,32 +238,32 @@ function love.keypressed(key)
     -- deal with moving left in a line
     if key == 'left' then
         if cursorColumn == 1 and cursorLine ~= 1 then
-            leftStatus = 'up'
+            LeftStatus = 'up'
             cursorLine = cursorLine - 1 -- move cursorLine up one
             cursorColumn = #lines[cursorLine] + 1
         else
-            leftStatus = 'casual'
+            LeftStatus = 'casual'
             cursorColumn = math.max(1, cursorColumn -1)
         end
     end
     -- deal with moving right in a line
     if key == 'right' then
         if cursorColumn == #lines[cursorLine] + 1 and lines[cursorLine + 1] then
-            rightStatus = 'down'
+            RightStatus = 'down'
             cursorLine = cursorLine + 1
             cursorColumn = 1
         else
-            rightStatus = 'casual'
+            RightStatus = 'casual'
             cursorColumn = math.min(#lines[cursorLine] + 1, cursorColumn + 1)
         end
     end
     -- deal with moving up lines
     if key == 'up' then
-        if cursorLine == 1 and cursorColumn ~= 1 then 
-            upStatus = 'start'
+        if cursorLine == 1 and cursorColumn ~= 1 then
+            UpStatus = 'start'
             cursorColumn = 1
         else
-            upStatus = 'casual'
+            UpStatus = 'casual'
             cursorLine = math.max(1, cursorLine - 1)
             
             local line = lines[cursorLine]
