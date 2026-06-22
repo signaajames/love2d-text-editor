@@ -173,7 +173,7 @@ function love.keypressed(key)
             if #lines > 1 and lines[cursorLine + 1] == "" then
                 DelStatus = 'line'
                 table.remove(lines, cursorLine + 1)
-            elseif #lines > 1 and lines[cursorLine + 1] ~= "" then
+            elseif lines[cursorLine + 1] ~= nil then
                 DelStatus = 'merg'
                 -- take everything in the line below cursorLine
                 local mergContent = lines[cursorLine + 1]
